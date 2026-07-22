@@ -9,20 +9,9 @@ import fitz
 import structlog
 
 from src.ingestion.models import Document, DocumentMetadata
+from src.ingestion.exceptions import BaseIngestionError, PdfReadError, PageExtractionError
 
 logger = structlog.get_logger(__name__)
-
-
-class IngestionError(Exception):
-    """Base exception for all ingestion-related failures."""
-
-
-class PdfReadError(IngestionError):
-    """Raised when a PDF file cannot be opened or read."""
-
-
-class PageExtractionError(IngestionError):
-    """Raised when text extraction fails for a specific page."""
 
 
 def load_pdf(file_path: Path, skip_empty_pages: bool = True) -> list[Document]:
@@ -88,7 +77,7 @@ def load_pdfs_iter(
     for pdf_file in pdf_files:
         try:
             documents = load_pdf(pdf_file, skip_empty_pages=skip_empty_pages)
-        except IngestionError as exc:
+        except BaseIngestionError as exc:
             logger.error(
                 "pdf_load_failed_skipping",
                 file=pdf_file.name,
