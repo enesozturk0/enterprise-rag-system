@@ -10,6 +10,7 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
+
 class TextPreprocessor:
     """Cleans raw page text before chunking.
     Header/footer detection is a corpus-level operation
@@ -17,7 +18,8 @@ class TextPreprocessor:
     intentionally kept separate from the per-text 'clean()'
     method - see 'detect_repeated_lines'.
     """
-    def __init__(self, known_headers_footers: set[str] | None = None) :
+
+    def __init__(self, known_headers_footers: set[str] | None = None):
         self._known_headers_footers = known_headers_footers or set()
 
     def clean(self, text: str) -> str:
@@ -64,9 +66,9 @@ class TextPreprocessor:
 
     @staticmethod
     def detect_repeated_lines(
-            page_texts: list[str],
-            scan_lines: int = 2,
-            min_repeat_ratio: float = 0.8,
+        page_texts: list[str],
+        scan_lines: int = 2,
+        min_repeat_ratio: float = 0.8,
     ) -> set[str]:
         """Detect lines that repeat across pages (likely headers/footers)."""
 
@@ -88,15 +90,3 @@ class TextPreprocessor:
             total_pages=len(page_texts),
         )
         return repeated
-
-
-
-
-
-
-
-
-
-
-
-
