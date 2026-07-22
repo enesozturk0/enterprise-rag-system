@@ -7,9 +7,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env",          # proje kökündeki .env
+        env_file=".env",  # proje kökündeki .env
         env_file_encoding="utf-8",
-        extra="ignore",           # tanımsız env değişkenlerinde hata verme
+        extra="ignore",  # tanımsız env değişkenlerinde hata verme
     )
 
     # ── LLM ──────────────────────────────────────────────

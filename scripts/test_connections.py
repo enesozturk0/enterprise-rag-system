@@ -44,8 +44,7 @@ def test_generate() -> bool:
 
     except httpx.ConnectError:
         print(
-            f"LLM test failed: could not connect to {settings.ollama_base_url} "
-            "(is Ollama running?)"
+            f"LLM test failed: could not connect to {settings.ollama_base_url} (is Ollama running?)"
         )
         return False
     except httpx.HTTPStatusError as e:

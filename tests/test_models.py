@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from src.ingestion.models import DocumentMetadata, Document
+from src.ingestion.models import Document, DocumentMetadata
 
 
 def test_valid_metadata():
