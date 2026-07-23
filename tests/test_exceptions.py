@@ -2,10 +2,10 @@ import pytest
 
 from src.ingestion.exceptions import (
     BaseIngestionError,
-    PdfReadError,
-    PageExtractionError,
-    PreprocessingError,
     ChunkingError,
+    PageExtractionError,
+    PdfReadError,
+    PreprocessingError,
 )
 
 
@@ -46,7 +46,7 @@ def test_optional_context_fields_are_keyword_only():
 def test_loader_reexports_still_work():
     # loader.py artık exceptions.py'den import ediyor olmalı,
     # kendi sınıflarını tanımlamıyor olmalı
-    from src.ingestion.loader import PdfReadError as LoaderPdfReadError
     from src.ingestion.exceptions import PdfReadError as CentralPdfReadError
+    from src.ingestion.loader import PdfReadError as LoaderPdfReadError
 
     assert LoaderPdfReadError is CentralPdfReadError

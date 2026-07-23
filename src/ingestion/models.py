@@ -42,3 +42,28 @@ class Document(BaseModel):
         from langchain_core.documents import Document as LCDocument
 
         return LCDocument(page_content=self.content, metadata=self.metadata.model_dump())
+
+
+class FailedFile(BaseModel):
+    """Record of a single file that could not be processed."""
+
+    file_name: str = Field(..., description="Name of the file that failed")
+    error_type: str = Field(..., description="Exception class name, e.g. 'PdfReadError'")
+    error_detail: str = Field(..., description="Human-readable error message")
+
+
+class IngestionResult(BaseModel):
+    """Complete summary returned by the ingestion pipeline."""
+
+    documents: list[Document] = Field(
+        default_factory=list, description="Successfully chunked documents"
+    )
+    total_files: int = Field(default=0, ge=0, description="Total files attempted")
+    successful_files: int = Field(default=0, ge=0, description="Files processed without errors")
+    failed_files: list[FailedFile] = Field(
+        default_factory=list, description="Files that failed + reasons"
+    )
+    total_chunks: int = Field(default=0, ge=0, description="Total chunks produced")
+    processing_time_seconds: float = Field(
+        default=0.0, ge=0, description="Wall-clock pipeline duration"
+    )
