@@ -8,8 +8,8 @@ from pathlib import Path
 import fitz
 import structlog
 
+from src.ingestion.exceptions import BaseIngestionError, PageExtractionError, PdfReadError
 from src.ingestion.models import Document, DocumentMetadata
-from src.ingestion.exceptions import BaseIngestionError, PdfReadError, PageExtractionError
 
 logger = structlog.get_logger(__name__)
 

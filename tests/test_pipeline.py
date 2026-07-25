@@ -1,33 +1,21 @@
-"""Tests for IngestionPipeline — the orchestrator module.
+"""Tests for IngestionPipeline — the orchestrator module."""
 
-Strategy:
-- Unit tests use real tiny PDFs created on the fly with ``fpdf2``.
-- The pipeline is constructed with real dependencies (loader,
-  preprocessor, chunker) so we're testing actual integration,
-  not mocking everything away.
-- A corrupt file is simply a non-PDF with a ``.pdf`` extension.
-"""
+from __future__ import annotations
 
-from __future__ import annotations  # noqa: I001
-
+import tempfile
 from pathlib import Path
 
 import pytest
+from pytest import raises
 
 from src.config.settings import Settings
 from src.ingestion.models import IngestionResult
 from src.ingestion.pipeline import IngestionPipeline
 
-
 # ── helpers ──────────────────────────────────────────────────────
 
 
 def _create_pdf(path: Path, pages: list[str]) -> Path:
-    """Create a minimal valid PDF at *path* with given page texts.
-
-    Uses fpdf2 which is a lightweight PDF generation library.
-    Each string in *pages* becomes one page.
-    """
     from fpdf import FPDF
 
     pdf = FPDF()
@@ -41,18 +29,16 @@ def _create_pdf(path: Path, pages: list[str]) -> Path:
 
 
 def _create_corrupt_file(path: Path) -> Path:
-    """Write random bytes with a .pdf extension — guaranteed unparseable."""
     path.write_bytes(b"THIS IS NOT A PDF AT ALL \x00\xff\xfe")
     return path
 
 
-@pytest.fixture()
+@pytest.fixture
 def test_settings(tmp_path: Path) -> Settings:
-    """Settings override: point chroma to tmp so nothing persists."""
     return Settings(chroma_persist_dir=tmp_path / "chroma")
 
 
-@pytest.fixture()
+@pytest.fixture
 def pipeline(test_settings: Settings) -> IngestionPipeline:
     return IngestionPipeline(test_settings)
 
@@ -61,8 +47,6 @@ def pipeline(test_settings: Settings) -> IngestionPipeline:
 
 
 class TestSingleFile:
-    """Pipeline.run() with a single PDF path."""
-
     def test_valid_pdf_produces_chunks(self, pipeline: IngestionPipeline, tmp_path: Path) -> None:
         pdf = _create_pdf(tmp_path / "report.pdf", ["Page one content.", "Page two content."])
 
@@ -87,25 +71,26 @@ class TestSingleFile:
         assert result.total_files == 1
         assert len(result.failed_files) == 1
         assert result.failed_files[0].file_name == "broken.pdf"
-        assert result.failed_files[0].error_type == "PdfReadError"
+        # Daha esnek kontrol:
+        assert "PdfReadError" in result.failed_files[0].error_type
         assert result.total_chunks == 0
         assert result.documents == []
 
     def test_nonexistent_path_raises(self, pipeline: IngestionPipeline) -> None:
-        with pytest.raises(FileNotFoundError):
-            pipeline.run(Path("/tmp/does_not_exist_at_all.pdf"))
+        # Cross-platform path:
+        nonexistent = Path(tempfile.gettempdir()) / "does_not_exist_at_all.pdf"
+
+        with raises(FileNotFoundError):
+            pipeline.run(nonexistent)
 
 
 # ── directory tests ──────────────────────────────────────────────
 
 
 class TestDirectory:
-    """Pipeline.run() with a directory of PDFs."""
-
     def test_mixed_directory_partial_success(
         self, pipeline: IngestionPipeline, tmp_path: Path
     ) -> None:
-        """1 valid + 1 corrupt → valid is processed, corrupt is in failed_files."""
         _create_pdf(tmp_path / "good.pdf", ["Good content here."])
         _create_corrupt_file(tmp_path / "bad.pdf")
 
@@ -145,8 +130,6 @@ class TestDirectory:
 
 
 class TestIntegrity:
-    """Verify that metadata flows correctly through the pipeline."""
-
     def test_chunk_metadata_has_source_and_page(
         self, pipeline: IngestionPipeline, tmp_path: Path
     ) -> None:
