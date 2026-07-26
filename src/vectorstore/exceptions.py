@@ -23,12 +23,14 @@ class BaseVectorStoreError(Exception):
 class EmbeddingError(BaseVectorStoreError):
     """Raised when an embedding fails."""
 
+
 class StoreConnectionError(BaseVectorStoreError):
     """Raised when a vectorstore connection fails."""
+
 
 class DocumentNotFoundError(BaseVectorStoreError):
     """Raised when a document ID does not exist in the vectorstore."""
 
+
 class DuplicateDocumentError(BaseVectorStoreError):
     """Raised when a document ID already exists in the vectorstore."""
-

@@ -27,6 +27,12 @@ class VectorStore(ABC):
     ) -> list[str]: ...
 
     @abstractmethod
+    def get_ids(
+        self,
+        filters: dict[str, Any],
+    ) -> list[str]: ...
+
+    @abstractmethod
     def search(
         self,
         query_embedding: list[float],
@@ -151,6 +157,13 @@ class ChromaVectorStore(VectorStore):
         count_before = self.count()
         self._collection.delete(ids=ids)
         return count_before - self.count()
+
+    def get_ids(self, filters: dict[str, Any]) -> list[str]:
+        if not filters:
+            raise ValueError("At least one metadata filter is required for ID queries.")
+
+        response = self._collection.get(where=filters, include=[])
+        return list(response["ids"])
 
     def count(self) -> int:
         return self._collection.count()

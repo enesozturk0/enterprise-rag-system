@@ -25,10 +25,10 @@ def main() -> None:
     if result.failed_files:
         print("\nFailures:")
         for failed in result.failed_files:
-            print(f"- {failed.path}: {failed.error}")
+            print(f"- {failed.file_name}: {failed.error_detail}")
 
     if result.documents:
-        sample = result.documents[1]
+        sample = result.documents[0]
 
         print("\nFirst chunk")
         print(f"Source: {sample.metadata.source}")

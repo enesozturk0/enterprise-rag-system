@@ -33,6 +33,9 @@ class OllamaEmbeddingClient:
         batch_size: int,
         client: httpx.Client | None = None,
     ) -> None:
+        if batch_size <= 0:
+            raise ValueError("batch_size must be positive.")
+
         self._base_url = base_url.rstrip("/")
         self._model_name = model_name
         self._batch_size = batch_size
