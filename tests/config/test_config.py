@@ -12,14 +12,23 @@ def test_default_values():
     assert settings.llm_model_name == "llama3.1:8b"
     assert settings.embedding_model_name == "bge-m3"
     assert settings.api_port == 8000
+    assert settings.retrieval_top_k == 5
+    assert settings.llm_temperature == 0.1
+    assert settings.llm_max_tokens == 1024
 
 
 def test_env_override(monkeypatch):
     monkeypatch.setenv("CHUNK_SIZE", "1024")
+    monkeypatch.setenv("RETRIEVAL_TOP_K", "3")
+    monkeypatch.setenv("LLM_TEMPERATURE", "0.0")
+    monkeypatch.setenv("LLM_MAX_TOKENS", "512")
 
     settings = Settings(_env_file=None)
 
     assert settings.chunk_size == 1024
+    assert settings.retrieval_top_k == 3
+    assert settings.llm_temperature == 0.0
+    assert settings.llm_max_tokens == 512
 
 
 def test_invalid_chunk_size():

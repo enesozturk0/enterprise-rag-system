@@ -67,7 +67,6 @@ def load_pdfs_iter(
     glob_pattern: str = "*.pdf",
     skip_empty_pages: bool = True,
 ) -> Generator[Document]:
-
     pdf_files = sorted(directory.glob(glob_pattern))
     logger.info(
         "pdf_directory_scan",
