@@ -28,6 +28,11 @@ class Settings(BaseSettings):
     # ── Embedding ────────────────────────────────────────
     embedding_batch_size: int = 32
 
+    # ── RAG ────────────────────────────────────────────────────
+    retrieval_top_k: int = 5
+    llm_temperature: float = 0.1
+    llm_max_tokens: int = 1024
+
     # ── API ──────────────────────────────────────────────
     api_host: str = "0.0.0.0"
     api_port: int = 8000

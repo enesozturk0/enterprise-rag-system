@@ -6,9 +6,11 @@ from typing import Any
 
 import chromadb
 from chromadb.api import ClientAPI
+from chromadb.errors import ChromaError
 from pydantic import BaseModel, Field
 
 from src.ingestion.models import Document
+from src.vectorstore.exceptions import StoreConnectionError
 
 
 class SearchResult(BaseModel):
@@ -107,19 +109,25 @@ class ChromaVectorStore(VectorStore):
         if k <= 0:
             raise ValueError("k must be positive.")
 
-        record_count = self.count()
-        if record_count == 0:
-            return []
+        try:
+            record_count = self.count()
+            if record_count == 0:
+                return []
 
-        query_arguments: dict[str, Any] = {
-            "query_embeddings": [query_embedding],
-            "n_results": min(k, record_count),
-        }
+            query_arguments: dict[str, Any] = {
+                "query_embeddings": [query_embedding],
+                "n_results": min(k, record_count),
+            }
 
-        if filters is not None:
-            query_arguments["where"] = filters
+            if filters is not None:
+                query_arguments["where"] = filters
 
-        response = self._collection.query(**query_arguments)
+            response = self._collection.query(**query_arguments)
+        except ChromaError as exc:
+            raise StoreConnectionError(
+                "Vector search failed.",
+                details={"cause": str(exc)},
+            ) from exc
 
         documents = (response.get("documents") or [[]])[0]
         metadatas = (response.get("metadatas") or [[]])[0]
