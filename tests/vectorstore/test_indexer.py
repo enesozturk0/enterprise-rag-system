@@ -95,6 +95,7 @@ def test_failed_batch_does_not_stop_remaining_batches() -> None:
     assert result.total_batches == 2
     assert store.count() == 2
 
+
 def test_index_empty_list_returns_zero_counts() -> None:
     store = make_store()
     indexer = DocumentIndexer(FakeEmbeddingClient(), store, batch_size=2)
