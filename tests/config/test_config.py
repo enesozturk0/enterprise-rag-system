@@ -43,3 +43,18 @@ def test_api_key_is_masked():
 
     assert "secret-value-123" not in masked
     assert settings.api_key.get_secret_value() == "secret-value-123"
+
+
+def test_cors_origins_are_normalized_and_deduplicated() -> None:
+    settings = Settings(
+        _env_file=None,
+        api_cors_origins=[
+            " http://localhost:8501/ ",
+            "http://localhost:8501",
+        ],
+    )
+
+    assert settings.api_cors_origins == ["http://localhost:8501"]
+
+    with pytest.raises(pydantic.ValidationError):
+        Settings(_env_file=None, api_cors_origins=[" * "])

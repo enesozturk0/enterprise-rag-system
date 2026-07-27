@@ -1,7 +1,7 @@
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import SecretStr, field_validator
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -37,6 +37,8 @@ class Settings(BaseSettings):
     api_host: str = "0.0.0.0"
     api_port: int = 8000
     api_key: SecretStr = SecretStr("change-me-in-production")
+    api_max_upload_size_mb: int = Field(default=25, ge=1, le=500)
+    api_cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:8501"])
 
     # ── Logging ──────────────────────────────────────────
     log_level: str = "INFO"
@@ -73,6 +75,18 @@ class Settings(BaseSettings):
         if not 1 <= v <= 65535:
             raise ValueError("API_PORT must be between 1-65535")
         return v
+
+    @field_validator("api_cors_origins")
+    @classmethod
+    def cors_origins_must_be_explicit(cls, origins: list[str]) -> list[str]:
+        normalized_origins = list(dict.fromkeys(origin.strip().rstrip("/") for origin in origins))
+
+        if not normalized_origins or any(not origin for origin in normalized_origins):
+            raise ValueError("API_CORS_ORIGINS must contain at least one origin")
+        if "*" in normalized_origins:
+            raise ValueError("API_CORS_ORIGINS must not contain '*'")
+
+        return normalized_origins
 
 
 @lru_cache
