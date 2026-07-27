@@ -44,10 +44,7 @@ def test_create_app_wires_routes_metrics_handlers_and_cors(monkeypatch) -> None:
         assert "/api/v1/documents/stats" in paths
 
         assert RetrievalError in application.exception_handlers
-        assert (
-            allowed_preflight.headers["access-control-allow-origin"]
-            == allowed_origin
-        )
+        assert allowed_preflight.headers["access-control-allow-origin"] == allowed_origin
         assert "access-control-allow-origin" not in blocked_preflight.headers
     finally:
         get_settings.cache_clear()

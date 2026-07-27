@@ -52,8 +52,7 @@ def _validate_upload_filename(filename: str | None) -> str:
     safe_name = Path(normalized).name
 
     contains_invalid_character = any(
-        character in _INVALID_FILENAME_CHARS or ord(character) < 32
-        for character in safe_name
+        character in _INVALID_FILENAME_CHARS or ord(character) < 32 for character in safe_name
     )
 
     if (
@@ -167,8 +166,7 @@ def upload_document(
         successful_files=ingestion_result.successful_files,
         failed_files=len(ingestion_result.failed_files),
         processing_time_seconds=round(
-            ingestion_result.processing_time_seconds
-            + indexing_result.duration_seconds,
+            ingestion_result.processing_time_seconds + indexing_result.duration_seconds,
             3,
         ),
         message=message,

@@ -48,9 +48,7 @@ def document_api() -> Iterator[tuple[TestClient, Mock, Mock, Mock]]:
         total_batches=1,
         duration_seconds=0.2,
     )
-    indexer.delete_by_source.side_effect = (
-        lambda source: 2 if source == "rapor.pdf" else 0
-    )
+    indexer.delete_by_source.side_effect = lambda source: 2 if source == "rapor.pdf" else 0
 
     store = Mock()
     store.count.return_value = 7
@@ -150,6 +148,7 @@ def test_delete_missing_source_returns_404(
     )
 
     assert response.status_code == 404
+
 
 def test_documents_reject_invalid_api_key(
     document_api: tuple[TestClient, Mock, Mock, Mock],

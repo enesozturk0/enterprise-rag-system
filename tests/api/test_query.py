@@ -5,19 +5,22 @@ from fastapi.testclient import TestClient
 
 from src.api.dependencies import get_rag_chain
 from src.api.routes.query import router
-from src.rag.chain import RAGResponse, SourceInfo
 from src.config.settings import Settings, get_settings
+from src.rag.chain import RAGResponse, SourceInfo
 
 _TEST_API_KEY = "test-only-api-key-123456789"
 
 
 class FakeRAGChain:
     def __init__(self) -> None:
-        self.last_call: tuple[
-            str,
-            int | None,
-            dict[str, Any] | None,
-        ] | None = None
+        self.last_call: (
+            tuple[
+                str,
+                int | None,
+                dict[str, Any] | None,
+            ]
+            | None
+        ) = None
 
     def query(
         self,

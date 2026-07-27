@@ -29,11 +29,7 @@ def query_documents(
 ) -> QueryResponse:
     """Answer a question using the indexed documents."""
 
-    filters = (
-        {"source": body.source_filter}
-        if body.source_filter is not None
-        else None
-    )
+    filters = {"source": body.source_filter} if body.source_filter is not None else None
 
     rag_response = chain.query(
         question=body.question,

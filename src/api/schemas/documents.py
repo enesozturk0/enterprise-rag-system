@@ -31,9 +31,7 @@ class UploadResponse(BaseModel):
     def chunk_counts_must_balance(self) -> Self:
         # chunk counts must balance
         if self.indexed_chunks + self.failed_chunks != self.total_chunks:
-            raise ValueError(
-                "indexed_chunks + failed_chunks must equal total_chunks"
-            )
+            raise ValueError("indexed_chunks + failed_chunks must equal total_chunks")
         return self
 
 
