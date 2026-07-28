@@ -1,29 +1,29 @@
 # Enterprise RAG System
 
-PDF dokümanlarını indeksleyen ve kaynak göstererek yanıtlayan production odaklı
-RAG sistemi.
+A production-oriented RAG system that indexes PDF documents and answers
+questions with source citations.
 
-Sistem şu servislerden oluşur:
+The system consists of:
 
-- FastAPI backend
-- Streamlit kullanıcı arayüzü
-- Ollama LLM ve embedding servisi
-- ChromaDB vektör veritabanı
-- RAG değerlendirme ve kalite kapısı
+- A FastAPI backend
+- A Streamlit user interface
+- Ollama for LLM and embedding inference
+- ChromaDB for vector storage
+- A RAG evaluation suite and quality gate
 
-## Gereksinimler
+## Requirements
 
-- Docker Desktop veya Docker Engine
+- Docker Desktop or Docker Engine
 - Docker Compose v2
-- En az 8 GB RAM
-- Model dosyaları için en az 10 GB boş disk alanı
+- At least 8 GB of RAM
+- At least 10 GB of free disk space for model files
 
-İlk kurulumda yaklaşık 6.1 GB büyüklüğündeki `llama3.1:8b` ve `bge-m3`
-modelleri otomatik indirilir.
+The first startup automatically downloads the `llama3.1:8b` and `bge-m3`
+models, which require approximately 6.1 GB in total.
 
-## Hızlı Başlangıç
+## Quick Start
 
-### 1. Environment dosyasını oluştur
+### 1. Create the environment file
 
 PowerShell:
 
@@ -31,16 +31,16 @@ PowerShell:
 Copy-Item .env.production.example .env
 ```
 
-Linux veya macOS:
+Linux or macOS:
 
 ```bash
 cp .env.production.example .env
 ```
 
-`.env` dosyasında `API_KEY` ve `RAG_API_KEY` alanlarını aynı güçlü ve rastgele
-değerle değiştir.
+Replace `API_KEY` and `RAG_API_KEY` in `.env` with the same strong random
+value.
 
-PowerShell ile güvenli bir anahtar üretmek için:
+Generate a secure key with PowerShell:
 
 ```powershell
 $bytes = New-Object byte[] 32
@@ -48,34 +48,35 @@ $bytes = New-Object byte[] 32
 [Convert]::ToBase64String($bytes)
 ```
 
-Üretilen değeri iki alana da yaz:
+Assign the generated value to both variables:
 
 ```env
 API_KEY=GENERATED_SECRET
 RAG_API_KEY=GENERATED_SECRET
 ```
 
-`.env` dosyasını Git'e ekleme.
+Never commit the `.env` file.
 
-### 2. Servisleri başlat
+### 2. Start the services
 
 ```powershell
 docker compose up --detach --build
 ```
 
-İlk model indirme işlemini takip et:
+Follow the initial model download:
 
 ```powershell
 docker compose logs --follow ollama-models
 ```
 
-Hazır olduğunda şu mesaj görüntülenir:
+The initialization service prints the following message when the models are
+ready:
 
 ```text
 Required Ollama models are ready.
 ```
 
-### 3. Servisleri doğrula
+### 3. Verify the services
 
 ```powershell
 docker compose ps
@@ -83,59 +84,59 @@ Invoke-RestMethod http://127.0.0.1:8000/health
 Invoke-RestMethod http://127.0.0.1:8501/_stcore/health
 ```
 
-Beklenen servis durumları:
+Expected service states:
 
 - `ollama`: healthy
 - `ollama-models`: exited (0)
 - `api`: healthy
 - `ui`: healthy
 
-`ollama-models` tek seferlik başlangıç servisidir. Modelleri indirdikten sonra
-`Exited (0)` durumunda olması normaldir.
+`ollama-models` is a one-shot initialization service. An `Exited (0)` status
+after the models have been downloaded is expected.
 
-## Erişim Adresleri
+## Service Endpoints
 
 - Streamlit UI: http://127.0.0.1:8501
-- FastAPI dokümantasyonu: http://127.0.0.1:8000/docs
+- FastAPI documentation: http://127.0.0.1:8000/docs
 - API health check: http://127.0.0.1:8000/health
-- Prometheus metrikleri: http://127.0.0.1:8000/metrics
+- Prometheus metrics: http://127.0.0.1:8000/metrics
 
-Ollama portu güvenlik amacıyla host sistemine açılmaz; yalnızca Compose ağı
-içindeki API servisi tarafından erişilebilir.
+The Ollama port is intentionally not published to the host. It is accessible
+only by the API service through the internal Compose network.
 
-## İlk Kullanım
+## First Use
 
-1. Streamlit arayüzünü aç.
-2. Sidebar üzerinden bir PDF yükle.
-3. İndeksleme tamamlandıktan sonra doküman hakkında soru sor.
-4. Yanıtın altındaki kaynak, sayfa ve skor bilgilerini kontrol et.
+1. Open the Streamlit interface.
+2. Upload a PDF from the sidebar.
+3. Ask a question about the document after indexing is complete.
+4. Review the source, page, and score details below the answer.
 
-## Yaygın Docker Komutları
+## Common Docker Commands
 
 ```powershell
-# Servis durumları
+# Show service status
 docker compose ps
 
-# Tüm loglar
+# Follow all logs
 docker compose logs --follow
 
-# Yalnızca API logları
+# Follow API logs
 docker compose logs --follow api
 
-# Servisleri yeniden başlat
+# Restart the services
 docker compose restart
 
-# Servisleri durdur; verileri koru
+# Stop services without deleting persistent data
 docker compose down
 
-# Image'ları yeniden oluştur
+# Rebuild the application images
 docker compose build api ui
 ```
 
-Named volume'lar sayesinde `docker compose down` sonrasında Chroma verileri ve
-Ollama modelleri korunur.
+Named volumes preserve Chroma data and Ollama models after
+`docker compose down`.
 
-## Geliştirici Komutları
+## Developer Commands
 
 Windows:
 
@@ -145,7 +146,7 @@ Windows:
 .\scripts\dev.ps1 docker-config
 ```
 
-GNU Make bulunan sistemler:
+Systems with GNU Make:
 
 ```bash
 make help
@@ -153,20 +154,20 @@ make quality
 make docker-config
 ```
 
-Integration testleri çalışan Ollama ve Chroma servisleri gerektirir:
+Integration tests require running Ollama and Chroma services:
 
 ```powershell
 .\scripts\dev.ps1 test-all
 ```
 
-## Production Notları
+## Production Notes
 
-Varsayılan olarak API ve UI yalnızca `127.0.0.1` üzerinde yayınlanır. Uzak
-erişim için TLS kullanan bir reverse proxy üzerinden yayınlanmaları önerilir.
+The API and UI bind to `127.0.0.1` by default. For remote access, expose them
+through a TLS-enabled reverse proxy.
 
-Production ortamında:
+In production:
 
-- `.env` dosyasını Git'e ekleme.
-- Güçlü ve benzersiz bir API anahtarı kullan.
-- `BIND_ADDRESS` değerini yalnızca ağ mimarisi gerektiriyorsa değiştir.
-- Chroma ve Ollama volume'larını düzenli olarak yedekle.
+- Never commit the `.env` file.
+- Use a strong and unique API key.
+- Change `BIND_ADDRESS` only when required by the network architecture.
+- Back up the Chroma and Ollama volumes regularly.
