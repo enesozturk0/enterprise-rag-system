@@ -1,0 +1,132 @@
+questions:
+  - id: "fuel-type-octane"
+    question: "NT1100 için hangi yakıt tipi ve minimum oktan sayısı kullanılmalıdır?"
+    ground_truth: "Sadece kurşunsuz benzin kullanılmalı ve yakıt en az RON 91 oktan olmalıdır."
+    expected_sources:
+      - source: "nt1100-2025-kullanim-kitapcigi-erVacc.pdf"
+        pages: [229]
+
+  - id: "fuel-tank-capacity"
+    question: "NT1100 yakıt deposunun kapasitesi kaç litredir?"
+    ground_truth: "Yakıt deposunun kapasitesi 20,4 litredir."
+    expected_sources:
+      - source: "nt1100-2025-kullanim-kitapcigi-erVacc.pdf"
+        pages: [229]
+
+  - id: "accessory-socket-capacity"
+    question: "Aksesuar prizinin nominal elektrik kapasitesi nedir?"
+    ground_truth: "Aksesuar prizinin nominal kapasitesi 24 W, 12 V ve 2 A'dir."
+    expected_sources:
+      - source: "nt1100-2025-kullanim-kitapcigi-erVacc.pdf"
+        pages: [230]
+
+  - id: "engine-oil-standards"
+    question: "Honda dışındaki bir motor yağı hangi standartları karşılamalıdır?"
+    ground_truth: "Yağ JASO T 903 MA, SAE 10W-30 ve API SJ veya üstü standartlarını karşılamalı; Enerji Tasarruflu veya Kaynak Koruyan olarak işaretlenmemelidir."
+    expected_sources:
+      - source: "nt1100-2025-kullanim-kitapcigi-erVacc.pdf"
+        pages: [246]
+
+  - id: "recommended-brake-fluid"
+    question: "NT1100 için tavsiye edilen fren hidroliği hangisidir?"
+    ground_truth: "Honda DOT 4 Fren Hidroliği veya eşdeğeri kullanılmalıdır."
+    expected_sources:
+      - source: "nt1100-2025-kullanim-kitapcigi-erVacc.pdf"
+        pages: [247]
+
+  - id: "coolant-mixture"
+    question: "Tavsiye edilen soğutma suyu karışımının antifriz ve distile su oranı nedir?"
+    ground_truth: "Karışım yüzde 50 antifriz ve yüzde 50 distile sudan oluşmalıdır."
+    expected_sources:
+      - source: "nt1100-2025-kullanim-kitapcigi-erVacc.pdf"
+        pages: [249]
+
+  - id: "tire-pressure-check"
+    question: "Lastik hava basıncı ne zaman ve hangi sıklıkla kontrol edilmelidir?"
+    ground_truth: "Hava basıncı lastikler soğukken, en az ayda bir kez veya lastiklerin havasının indiği düşünüldüğünde kontrol edilmelidir."
+    expected_sources:
+      - source: "nt1100-2025-kullanim-kitapcigi-erVacc.pdf"
+        pages: [249]
+
+  - id: "engine-oil-check"
+    question: "Motor yağı seviyesi nasıl kontrol edilir?"
+    ground_truth: "Motor 3-5 dakika rölantide çalıştırılıp kapatıldıktan sonra 2-3 dakika beklenmeli; motosiklet düz zeminde dik tutulmalı, silinen seviye çubuğu vidalanmadan takılmalı ve yağın alt ile üst işaretler arasında olduğu kontrol edilmelidir."
+    expected_sources:
+      - source: "nt1100-2025-kullanim-kitapcigi-erVacc.pdf"
+        pages: [262]
+
+  - id: "engine-oil-addition"
+    question: "Motor yağı hangi seviyeye kadar eklenmeli ve hangi uyarıya dikkat edilmelidir?"
+    ground_truth: "Yağ üst seviye işaretine kadar eklenmeli, bu işaret aşılmamalı ve farklı marka veya derecedeki yağlar karıştırılmamalıdır."
+    expected_sources:
+      - source: "nt1100-2025-kullanim-kitapcigi-erVacc.pdf"
+        pages: [263]
+
+  - id: "coolant-level-check"
+    question: "Soğutma suyu seviyesi nasıl kontrol edilir ve düşükse ne yapılmalıdır?"
+    ground_truth: "Motor soğukken motosiklet düz zeminde dik tutulmalı ve yedek depodaki seviye ALT ile ÜST işaretleri arasında olmalıdır. Seviye düşükse yedek depo kapağından ÜST çizgisine kadar soğutma suyu eklenmeli, radyatör kapağı açılmamalıdır."
+    expected_sources:
+      - source: "nt1100-2025-kullanim-kitapcigi-erVacc.pdf"
+        pages: [264]
+
+  - id: "brake-fluid-level"
+    question: "Ön ve arka fren hidroliği seviyeleri hangi işaretlere göre kontrol edilmelidir?"
+    ground_truth: "Ön fren hidroliği ALT işaretinin üzerinde; arka fren hidroliği ise ALT ve ÜST işaretlerinin arasında olmalıdır."
+    expected_sources:
+      - source: "nt1100-2025-kullanim-kitapcigi-erVacc.pdf"
+        pages: [266]
+
+  - id: "brake-pad-check"
+    question: "Fren balataları ne zaman değiştirilmelidir?"
+    ground_truth: "Balata aşınma göstergesi aşınma sınırına ulaştığında balatalar değiştirilmelidir ve sağ ile sol balatalar aynı anda değiştirilmelidir."
+    expected_sources:
+      - source: "nt1100-2025-kullanim-kitapcigi-erVacc.pdf"
+        pages: [267]
+
+  - id: "side-stand-safety"
+    question: "Yan ayak güvenlik sistemi nasıl kontrol edilir?"
+    ground_truth: "Motor çalışırken şanzıman vitese veya D moduna alınıp yan ayak tamamen indirildiğinde motor durmalıdır; durmazsa motosiklet serviste kontrol ettirilmelidir."
+    expected_sources:
+      - source: "nt1100-2025-kullanim-kitapcigi-erVacc.pdf"
+        pages: [270]
+
+  - id: "drive-chain-slack"
+    question: "Tahrik zinciri gevşekliği kaç milimetre olmalıdır ve hangi değerde motosiklet kullanılmamalıdır?"
+    ground_truth: "Tahrik zinciri gevşekliği 65-70 mm olmalıdır. Gevşeklik 80 mm'den fazlaysa motosiklet kullanılmamalıdır."
+    expected_sources:
+      - source: "nt1100-2025-kullanim-kitapcigi-erVacc.pdf"
+        pages: [271]
+
+  - id: "clutch-lever-freeplay"
+    question: "NT1100A debriyaj kolu boşluğu kaç milimetre olmalıdır?"
+    ground_truth: "Debriyaj kolu boşluğu 10-20 mm olmalıdır."
+    expected_sources:
+      - source: "nt1100-2025-kullanim-kitapcigi-erVacc.pdf"
+        pages: [273]
+
+  - id: "tire-pressure-values"
+    question: "NT1100 ön ve arka lastik hava basınçları kaç olmalıdır?"
+    ground_truth: "Ön lastik basıncı 250 kPa veya 36 psi, arka lastik basıncı 290 kPa veya 42 psi olmalıdır."
+    expected_sources:
+      - source: "nt1100-2025-kullanim-kitapcigi-erVacc.pdf"
+        pages: [341]
+
+  - id: "negative-company-revenue"
+    question: "Honda Türkiye'nin 2024 yılı net geliri ne kadardır?"
+    ground_truth: "__NOT_IN_CONTEXT__"
+    expected_sources: []
+
+  - id: "negative-wifi-password"
+    question: "Motosikletin Wi-Fi ağ şifresi nedir?"
+    ground_truth: "__NOT_IN_CONTEXT__"
+    expected_sources: []
+
+  - id: "negative-insurance-price"
+    question: "Bu motosikletin aylık kasko primi ne kadardır?"
+    ground_truth: "__NOT_IN_CONTEXT__"
+    expected_sources: []
+
+  - id: "negative-owner-address"
+    question: "Motosiklet sahibinin ev adresi nedir?"
+    ground_truth: "__NOT_IN_CONTEXT__"
+    expected_sources: []

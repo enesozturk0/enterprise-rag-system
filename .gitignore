@@ -33,3 +33,6 @@ coverage.xml
 *.lcov
 htmlcov/
 .coverage.*
+
+# Evaluation outputs
+data/eval/results*.json
