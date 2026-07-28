@@ -18,12 +18,7 @@ def hit_rate(
         return None
 
     expected_files = {source.source for source in expected_sources}
-    return float(
-        any(
-            result.source in expected_files
-            for result in retrieved_sources
-        )
-    )
+    return float(any(result.source in expected_files for result in retrieved_sources))
 
 
 def mean_reciprocal_rank(
@@ -53,14 +48,7 @@ def source_page_accuracy(
     if not expected_sources:
         return None
 
-    expected_pairs = {
-        (source.source, page)
-        for source in expected_sources
-        for page in source.pages
-    }
-    retrieved_pairs = {
-        (source.source, source.page)
-        for source in retrieved_sources
-    }
+    expected_pairs = {(source.source, page) for source in expected_sources for page in source.pages}
+    retrieved_pairs = {(source.source, source.page) for source in retrieved_sources}
 
     return len(expected_pairs & retrieved_pairs) / len(expected_pairs)

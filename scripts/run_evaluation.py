@@ -17,6 +17,12 @@ from src.evaluation.exceptions import (
     EvaluationPrerequisiteError,
 )
 from src.evaluation.models import EvalSummary
+from src.evaluation.quality_gate import (
+    DEFAULT_QUALITY_THRESHOLDS,
+    QualityThresholds,
+    QualityViolation,
+    check_quality_gate,
+)
 from src.evaluation.runner import EvaluationRunner
 from src.rag.chain import RAGChain
 from src.rag.generator import LLMGenerator
@@ -24,14 +30,6 @@ from src.rag.prompt import RAGPromptBuilder
 from src.rag.retriever import DocumentRetriever
 from src.vectorstore.embeddings import OllamaEmbeddingClient
 from src.vectorstore.store import ChromaVectorStore
-
-from src.evaluation.quality_gate import (
-    DEFAULT_QUALITY_THRESHOLDS,
-    QualityThresholds,
-    QualityViolation,
-    check_quality_gate,
-)
-
 
 DEFAULT_DATASET_PATH = Path("data/eval/golden_qa.yaml")
 DEFAULT_OUTPUT_PATH = Path("data/eval/results.json")
@@ -42,30 +40,23 @@ def _positive_integer(value: str) -> int:
     try:
         parsed_value = int(value)
     except ValueError as exc:
-        raise argparse.ArgumentTypeError(
-              f"Pozitif bir tamsayı bekleniyordu: {value!r}"
-        ) from exc
+        raise argparse.ArgumentTypeError(f"Pozitif bir tamsayı bekleniyordu: {value!r}") from exc
 
     if parsed_value < 1:
-        raise argparse.ArgumentTypeError(
-            "Değer sıfırdan büyük olmalıdır."
-        )
+        raise argparse.ArgumentTypeError("Değer sıfırdan büyük olmalıdır.")
 
     return parsed_value
+
 
 def _unit_interval(value: str) -> float:
     """Parse a floating-point threshold between zero and one."""
     try:
         parsed_value = float(value)
     except ValueError as exc:
-        raise argparse.ArgumentTypeError(
-            f"Expected a decimal value: {value!r}"
-        ) from exc
+        raise argparse.ArgumentTypeError(f"Expected a decimal value: {value!r}") from exc
 
     if not 0.0 <= parsed_value <= 1.0:
-        raise argparse.ArgumentTypeError(
-            "Threshold must be between 0 and 1."
-        )
+        raise argparse.ArgumentTypeError("Threshold must be between 0 and 1.")
 
     return parsed_value
 
@@ -172,9 +163,7 @@ def run_evaluation(
     try:
         with build_chain(settings) as (chain, vector_store):
             if vector_store.count() == 0:
-                raise EvaluationPrerequisiteError(
-                    "Vector store boş. Önce dokümanları indeksleyin."
-                )
+                raise EvaluationPrerequisiteError("Vector store boş. Önce dokümanları indeksleyin.")
 
             runner = EvaluationRunner(chain=chain, top_k=top_k)
             summary = runner.evaluate(dataset.questions)
@@ -182,9 +171,7 @@ def run_evaluation(
 
     except ChromaError as exc:
         # Chroma'nın iç hata ayrıntılarını kullanıcı çıktısına taşımıyoruz.
-        raise EvaluationPrerequisiteError(
-            "Vector store bağlantısı kurulamadı."
-        ) from exc
+        raise EvaluationPrerequisiteError("Vector store bağlantısı kurulamadı.") from exc
 
     return summary
 
@@ -208,23 +195,12 @@ def print_summary(
     print(f"Başarısız çalışma: {summary.failed_questions}")
     print(f"Ortalama süre: {summary.avg_duration_seconds:.2f} saniye")
     print(f"Hit rate: {_format_metric(summary.avg_hit_rate)}")
-    print(
-        "Reciprocal rank: "
-        f"{_format_metric(summary.avg_reciprocal_rank)}"
-    )
-    print(
-        "Kaynak-sayfa doğruluğu: "
-        f"{_format_metric(summary.avg_source_page_accuracy)}"
-    )
-    print(
-        "Faithfulness: "
-        f"{_format_metric(summary.avg_faithfulness)}"
-    )
-    print(
-        "Cevap ilgililiği: "
-        f"{_format_metric(summary.avg_answer_relevancy)}"
-    )
+    print(f"Reciprocal rank: {_format_metric(summary.avg_reciprocal_rank)}")
+    print(f"Kaynak-sayfa doğruluğu: {_format_metric(summary.avg_source_page_accuracy)}")
+    print(f"Faithfulness: {_format_metric(summary.avg_faithfulness)}")
+    print(f"Cevap ilgililiği: {_format_metric(summary.avg_answer_relevancy)}")
     print(f"Sonuç dosyası: {output_path}")
+
 
 def print_quality_violations(
     violations: tuple[QualityViolation, ...],
@@ -233,14 +209,9 @@ def print_quality_violations(
     print("\nQuality gate failed:", file=sys.stderr)
 
     for violation in violations:
-        actual = (
-            "N/A"
-            if violation.actual is None
-            else f"{violation.actual:.2%}"
-        )
+        actual = "N/A" if violation.actual is None else f"{violation.actual:.2%}"
         print(
-            f"- {violation.metric}: "
-            f"actual={actual}, minimum={violation.minimum:.2%}",
+            f"- {violation.metric}: actual={actual}, minimum={violation.minimum:.2%}",
             file=sys.stderr,
         )
 

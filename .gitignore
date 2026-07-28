@@ -6,8 +6,13 @@ dist/
 build/
 .venv/
 
-# Environment
+# Environment files may contain secrets
 .env
+.env.*
+
+# Safe templates remain version controlled
+!.env.example
+!.env.production.example
 
 # IDE
 .vscode/

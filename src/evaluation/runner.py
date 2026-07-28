@@ -65,9 +65,7 @@ class EvaluationRunner:
         """Load and validate a YAML golden dataset."""
 
         try:
-            raw_dataset = yaml.safe_load(
-                dataset_path.read_text(encoding="utf-8")
-            )
+            raw_dataset = yaml.safe_load(dataset_path.read_text(encoding="utf-8"))
             return EvaluationDataset.model_validate(raw_dataset)
         except (OSError, yaml.YAMLError, ValidationError) as exc:
             raise DatasetLoadError(
@@ -84,10 +82,7 @@ class EvaluationRunner:
     ) -> EvalSummary:
         """Evaluate all questions without stopping on expected RAG errors."""
 
-        results = [
-            self._evaluate_question(question)
-            for question in questions
-        ]
+        results = [self._evaluate_question(question) for question in questions]
         return self._build_summary(results)
 
     def _evaluate_question(
@@ -164,18 +159,14 @@ class EvaluationRunner:
         self,
         results: list[EvalResult],
     ) -> EvalSummary:
-        successful_questions = sum(
-            result.succeeded for result in results
-        )
+        successful_questions = sum(result.succeeded for result in results)
 
         return EvalSummary(
             total_questions=len(results),
             successful_questions=successful_questions,
             failed_questions=len(results) - successful_questions,
             top_k=self._top_k,
-            avg_hit_rate=self._average_available(
-                result.hit_rate for result in results
-            ),
+            avg_hit_rate=self._average_available(result.hit_rate for result in results),
             avg_reciprocal_rank=self._average_available(
                 result.reciprocal_rank for result in results
             ),
@@ -183,14 +174,11 @@ class EvaluationRunner:
                 result.source_page_accuracy for result in results
             ),
             avg_duration_seconds=(
-                sum(result.duration_seconds for result in results)
-                / len(results)
+                sum(result.duration_seconds for result in results) / len(results)
                 if results
                 else 0.0
             ),
-            avg_faithfulness=self._average_available(
-                result.faithfulness for result in results
-            ),
+            avg_faithfulness=self._average_available(result.faithfulness for result in results),
             avg_answer_relevancy=self._average_available(
                 result.answer_relevancy for result in results
             ),

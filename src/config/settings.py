@@ -1,7 +1,7 @@
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import Field, SecretStr, field_validator
+from pydantic import Field, SecretStr, ValidationInfo, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -54,12 +54,19 @@ class Settings(BaseSettings):
 
     @field_validator("chunk_overlap")
     @classmethod
-    def overlap_less_than_size(cls, v: int, info: ...) -> int:
+    def overlap_less_than_size(
+        cls,
+        v: int,
+        info: ValidationInfo,
+    ) -> int:
         chunk_size = info.data.get("chunk_size", 512)
+
         if v >= chunk_size:
             raise ValueError(f"CHUNK_OVERLAP ({v}) must be < CHUNK_SIZE ({chunk_size})")
+
         if v < 0:
             raise ValueError("CHUNK_OVERLAP must be >= 0")
+
         return v
 
     @field_validator("embedding_batch_size")

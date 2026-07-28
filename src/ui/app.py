@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import MutableMapping
-from typing import Literal, NotRequired, Protocol, TypedDict, cast
+from typing import Any, Literal, NotRequired, Protocol, TypedDict, cast
 
 import streamlit as st
 
@@ -28,6 +27,14 @@ class ChatMessage(TypedDict):
     is_error: NotRequired[bool]
 
 
+class SessionStateLike(Protocol):
+    """Minimum state interface required by UI helpers."""
+
+    def __contains__(self, key: object) -> bool: ...
+
+    def __setitem__(self, key: str, value: Any) -> None: ...
+
+
 class UploadedPDF(Protocol):
     """Required interface of a Streamlit uploaded PDF."""
 
@@ -41,7 +48,7 @@ class UploadedPDF(Protocol):
 
 
 def _initialize_session_state(
-    state: MutableMapping[str, object],
+    state: SessionStateLike,
 ) -> None:
     """Create session values without overwriting the existing history."""
 
@@ -70,7 +77,7 @@ def _api_error_message(
     """Return a safe message suitable for display and chat history."""
 
     if isinstance(error, APIAuthenticationError):
-        return "API kimlik doğrulaması başarısız. " "RAG_API_KEY ayarını kontrol edin."
+        return "API kimlik doğrulaması başarısız. RAG_API_KEY ayarını kontrol edin."
 
     if isinstance(error, APIConnectionError):
         return "Backend servisine ulaşılamıyor."
@@ -133,7 +140,7 @@ def _handle_delete(
             return
 
     st.session_state["total_chunks"] = None
-    st.success(f"{result.source} silindi. " f"{result.chunks_deleted} chunk kaldırıldı.")
+    st.success(f"{result.source} silindi. {result.chunks_deleted} chunk kaldırıldı.")
 
 
 def _refresh_stats(client: APIClient) -> None:
@@ -150,7 +157,7 @@ def _refresh_stats(client: APIClient) -> None:
 
 def _check_backend_health(
     client: APIClient,
-    state: MutableMapping[str, object],
+    state: SessionStateLike,
 ) -> None:
     """Update backend health only after an explicit user action."""
 
@@ -301,7 +308,7 @@ def _render_sources(sources: list[SourceDetail]) -> None:
     with st.expander(f"Kaynaklar ({len(sources)})"):
         for index, source in enumerate(sources):
             # st.text kullanmak kaynak adını Markdown olarak yorumlamaz.
-            st.text(f"{source.source} · Sayfa {source.page} " f"· Skor {source.score:.2f}")
+            st.text(f"{source.source} · Sayfa {source.page} · Skor {source.score:.2f}")
             st.caption(source.content_preview)
 
             if index < len(sources) - 1:
@@ -328,7 +335,7 @@ def _render_message_content(message: ChatMessage) -> None:
     model = message.get("model")
     duration = message.get("duration_seconds")
     if model is not None and duration is not None:
-        st.caption(f"Model: {model} · Süre: {duration:.2f} saniye " f"· Kaynak: {len(sources)}")
+        st.caption(f"Model: {model} · Süre: {duration:.2f} saniye · Kaynak: {len(sources)}")
 
 
 def _render_chat(

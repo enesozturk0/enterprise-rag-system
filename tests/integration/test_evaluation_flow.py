@@ -1,4 +1,5 @@
 """Service-independent end-to-end test for the evaluation flow."""
+
 from __future__ import annotations
 
 import json
@@ -18,9 +19,7 @@ from src.vectorstore.embeddings import OllamaEmbeddingClient
 from src.vectorstore.indexer import DocumentIndexer
 from src.vectorstore.store import ChromaVectorStore
 
-_VECTOR = [1.0] + [0.0] * (
-    OllamaEmbeddingClient.DIMENSION - 1
-)
+_VECTOR = [1.0] + [0.0] * (OllamaEmbeddingClient.DIMENSION - 1)
 
 
 def test_evaluation_flow_from_indexing_to_json(
@@ -39,12 +38,7 @@ def test_evaluation_flow_from_indexing_to_json(
 
             return httpx.Response(
                 status_code=200,
-                json={
-                    "embeddings": [
-                        _VECTOR.copy()
-                        for _ in inputs
-                    ]
-                },
+                json={"embeddings": [_VECTOR.copy() for _ in inputs]},
             )
 
         if request.url.path == "/api/generate":
@@ -54,8 +48,7 @@ def test_evaluation_flow_from_indexing_to_json(
                 status_code=200,
                 json={
                     "response": (
-                        "Motor yağı düz zeminde yağ seviye "
-                        "çubuğu kullanılarak kontrol edilir."
+                        "Motor yağı düz zeminde yağ seviye çubuğu kullanılarak kontrol edilir."
                     )
                 },
             )
@@ -145,9 +138,7 @@ questions:
         output_path = tmp_path / "results.json"
         runner.save_results(summary, output_path)
 
-    saved_result = json.loads(
-        output_path.read_text(encoding="utf-8")
-    )
+    saved_result = json.loads(output_path.read_text(encoding="utf-8"))
 
     assert summary.total_questions == 1
     assert summary.successful_questions == 1

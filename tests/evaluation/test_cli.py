@@ -57,6 +57,7 @@ def test_parse_args_uses_default_paths() -> None:
     assert args.min_reciprocal_rank == 0.60
     assert args.min_source_page_accuracy == 0.50
 
+
 @pytest.mark.parametrize(
     ("option", "value"),
     [
@@ -150,13 +151,12 @@ def test_main_returns_two_for_evaluation_setup_error(
     assert exit_code == 2
     assert "Evaluation çalıştırılamadı" in captured.err
 
+
 def test_main_returns_three_when_quality_gate_fails(
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    regressed_summary = _summary().model_copy(
-        update={"avg_hit_rate": 0.79}
-    )
+    regressed_summary = _summary().model_copy(update={"avg_hit_rate": 0.79})
 
     monkeypatch.setattr(run_evaluation, "get_settings", Mock())
     monkeypatch.setattr(

@@ -25,5 +25,6 @@ class DatasetLoadError(BaseEvaluationError):
 class ResultWriteError(BaseEvaluationError):
     """Raised when evaluation results cannot be saved."""
 
+
 class EvaluationPrerequisiteError(BaseEvaluationError):
     """The required conditions were not met before running the evaluation."""

@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-from typing import Self
+from typing import TYPE_CHECKING, Self
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 """Shared data models for the ingestion pipeline."""
+
+if TYPE_CHECKING:
+    from langchain_core.documents import Document as LangChainDocument
 
 
 class DocumentMetadata(BaseModel):
@@ -37,11 +40,14 @@ class Document(BaseModel):
     content: str = Field(..., min_length=1, description="Raw or chunked text content")
     metadata: DocumentMetadata
 
-    def to_langchain_document(self):
+    def to_langchain_document(self) -> LangChainDocument:
         """Adapter: convert to LangChain's Document type at the boundary"""
-        from langchain_core.documents import Document as LCDocument
+        from langchain_core.documents import Document as LangChainDocument
 
-        return LCDocument(page_content=self.content, metadata=self.metadata.model_dump())
+        return LangChainDocument(
+            page_content=self.content,
+            metadata=self.metadata.model_dump(),
+        )
 
 
 class FailedFile(BaseModel):

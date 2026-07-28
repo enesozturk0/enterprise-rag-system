@@ -6,6 +6,7 @@ from typing import Any
 
 import chromadb
 from chromadb.api import ClientAPI
+from chromadb.api.types import Metadata
 from chromadb.errors import ChromaError
 from pydantic import BaseModel, Field
 
@@ -75,7 +76,7 @@ class ChromaVectorStore(VectorStore):
             return []
 
         ids: list[str] = []
-        metadatas: list[dict[str, str | int | float | bool]] = []
+        metadatas: list[Metadata] = []
 
         for document in documents:
             metadata = document.metadata
@@ -143,14 +144,14 @@ class ChromaVectorStore(VectorStore):
             ids,
             strict=True,
         ):
-            # Converts cosine distance from 0–2 range to similarity from 1–0 range.
+            # Converts cosine distance from 0 to 2 range to similarity from 1–0 range.
             score = 1.0 - (float(distance) / 2.0)
             score = max(0.0, min(1.0, score))
 
             results.append(
                 SearchResult(
                     content=document,
-                    metadata=metadata or {},
+                    metadata=dict(metadata or {}),
                     score=score,
                     id=record_id,
                 )

@@ -19,16 +19,12 @@ class QualityThresholds:
         values = {
             "min_hit_rate": self.min_hit_rate,
             "min_reciprocal_rank": self.min_reciprocal_rank,
-            "min_source_page_accuracy": (
-                self.min_source_page_accuracy
-            ),
+            "min_source_page_accuracy": (self.min_source_page_accuracy),
         }
 
         for name, value in values.items():
             if not 0.0 <= value <= 1.0:
-                raise ValueError(
-                    f"{name} must be between 0 and 1."
-                )
+                raise ValueError(f"{name} must be between 0 and 1.")
 
 
 @dataclass(frozen=True, slots=True)

@@ -9,21 +9,13 @@ _EXPECTED_SOURCE = "nt1100-2025-kullanim-kitapcigi-erVacc.pdf"
 
 
 def test_golden_dataset_is_valid_and_balanced() -> None:
-    raw_dataset = yaml.safe_load(
-        _DATASET_PATH.read_text(encoding="utf-8")
-    )
+    raw_dataset = yaml.safe_load(_DATASET_PATH.read_text(encoding="utf-8"))
     dataset = EvaluationDataset.model_validate(raw_dataset)
 
     positive_questions = [
-        question
-        for question in dataset.questions
-        if not question.expects_no_answer
+        question for question in dataset.questions if not question.expects_no_answer
     ]
-    negative_questions = [
-        question
-        for question in dataset.questions
-        if question.expects_no_answer
-    ]
+    negative_questions = [question for question in dataset.questions if question.expects_no_answer]
 
     assert len(dataset.questions) == 20
     assert len(positive_questions) == 16
@@ -34,7 +26,4 @@ def test_golden_dataset_is_valid_and_balanced() -> None:
         for question in positive_questions
         for expected in question.expected_sources
     )
-    assert all(
-        not question.expected_sources
-        for question in negative_questions
-    )
+    assert all(not question.expected_sources for question in negative_questions)

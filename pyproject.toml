@@ -10,6 +10,8 @@ dependencies = [
     "chromadb>=1.5.9,<1.6",
     "fastapi>=0.115",
     "uvicorn[standard]>=0.32",
+    "gunicorn>=23.0",
+    "uvicorn-worker>=0.4.0",
     "pydantic>=2.0",
     "pydantic-settings>=2.0",
     "pyyaml>=6.0.2",
@@ -56,9 +58,19 @@ markers = [
 
 [tool.mypy]
 python_version = "3.11"
+plugins = ["pydantic.mypy"]
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
+follow_imports_for_stubs = true
+
+[[tool.mypy.overrides]]
+module = ["numpy", "numpy.*"]
+follow_imports = "skip"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src", "src.*"]
 
 [build-system]
 requires = ["setuptools>=75", "wheel"]

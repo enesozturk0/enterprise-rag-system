@@ -17,9 +17,7 @@ def _positive_question(question_id: str = "q1") -> EvalQuestion:
         id=question_id,
         question="Motor yağı nasıl kontrol edilir?",
         ground_truth="Yağ seviyesi düz zeminde kontrol edilir.",
-        expected_sources=[
-            ExpectedSource(source="manual.pdf", pages=[262, 263])
-        ],
+        expected_sources=[ExpectedSource(source="manual.pdf", pages=[262, 263])],
     )
 
 
@@ -68,9 +66,7 @@ def test_positive_and_negative_questions_are_validated() -> None:
             id="invalid-negative",
             question="Negatif soru",
             ground_truth=NOT_IN_CONTEXT,
-            expected_sources=[
-                ExpectedSource(source="manual.pdf", pages=[1])
-            ],
+            expected_sources=[ExpectedSource(source="manual.pdf", pages=[1])],
         )
 
 
@@ -146,6 +142,7 @@ def test_summary_counts_must_match_result_statuses() -> None:
             avg_duration_seconds=1.2,
             results=[result],
         )
+
 
 def test_negative_result_must_not_contain_retrieval_metrics() -> None:
     result = EvalResult(

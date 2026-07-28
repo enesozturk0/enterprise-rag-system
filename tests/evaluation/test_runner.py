@@ -21,9 +21,7 @@ def _positive_question() -> EvalQuestion:
         id="positive",
         question="Motor yağı nasıl kontrol edilir?",
         ground_truth="Yağ seviyesi düz zeminde kontrol edilir.",
-        expected_sources=[
-            ExpectedSource(source="manual.pdf", pages=[263])
-        ],
+        expected_sources=[ExpectedSource(source="manual.pdf", pages=[263])],
     )
 
 
@@ -113,9 +111,7 @@ def test_evaluate_aggregates_only_applicable_metrics() -> None:
     ]
     runner = EvaluationRunner(chain, top_k=3)
 
-    summary = runner.evaluate(
-        [_positive_question(), _negative_question()]
-    )
+    summary = runner.evaluate([_positive_question(), _negative_question()])
 
     assert summary.total_questions == 2
     assert summary.successful_questions == 2

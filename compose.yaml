@@ -1,0 +1,71 @@
+services:
+  ollama:
+    image: ollama/ollama:0.32.3
+    init: true
+    restart: unless-stopped
+    expose:
+      - "11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      start_period: 20s
+      retries: 10
+    networks:
+      - rag_network
+
+  api:
+    image: enterprise-rag-api:local
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    init: true
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      OLLAMA_BASE_URL: http://ollama:11434
+      CHROMA_PERSIST_DIR: /app/data/chroma_db
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${API_PORT:-8000}:8000"
+    volumes:
+      - chroma_data:/app/data/chroma_db
+    depends_on:
+      ollama:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 150s
+    networks:
+      - rag_network
+
+  ui:
+    image: enterprise-rag-ui:local
+    build:
+      context: .
+      dockerfile: docker/ui.Dockerfile
+    init: true
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      RAG_API_URL: http://api:8000
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${UI_PORT:-8501}:8501"
+    depends_on:
+      api:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - rag_network
+
+volumes:
+  ollama_data:
+  chroma_data:
+
+networks:
+  rag_network:
+    driver: bridge

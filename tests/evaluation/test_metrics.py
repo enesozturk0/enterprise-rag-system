@@ -82,18 +82,14 @@ def test_source_page_accuracy_full_match() -> None:
         _retrieved("manual.pdf", 262),
         _retrieved("manual.pdf", 263),
     ]
-    expected = [
-        ExpectedSource(source="manual.pdf", pages=[262, 263])
-    ]
+    expected = [ExpectedSource(source="manual.pdf", pages=[262, 263])]
 
     assert source_page_accuracy(retrieved, expected) == 1.0
 
 
 def test_source_page_accuracy_partial_match() -> None:
     retrieved = [_retrieved("manual.pdf", 262)]
-    expected = [
-        ExpectedSource(source="manual.pdf", pages=[262, 263, 264])
-    ]
+    expected = [ExpectedSource(source="manual.pdf", pages=[262, 263, 264])]
 
     assert source_page_accuracy(
         retrieved,

@@ -1,0 +1,53 @@
+# Version control
+.git
+.github
+
+# Python environments and build artifacts
+.venv
+__pycache__
+**/__pycache__
+*.py[cod]
+*.egg-info
+build
+dist
+
+# Test and development caches
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.coverage
+.coverage.*
+coverage.xml
+htmlcov
+
+# IDE and local tooling
+.vscode
+.idea
+.junie
+.codex
+
+# Tests and local documentation
+tests
+docs
+
+# Runtime data is provided through volumes
+data
+docker/volumes
+
+# Logs
+*.log
+
+# Local environment files may contain secrets
+.env
+.env.*
+
+# Safe templates must remain available
+!.env.example
+!.env.production.example
+
+# Repository-only development configuration
+.pre-commit-config.yaml
+
+# Operating system files
+.DS_Store
+Thumbs.db

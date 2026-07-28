@@ -74,14 +74,10 @@ class EvalQuestion(BaseModel):
     @model_validator(mode="after")
     def source_expectations_must_match_question_type(self) -> Self:
         if self.expects_no_answer and self.expected_sources:
-            raise ValueError(
-                "Negative questions cannot define expected sources."
-            )
+            raise ValueError("Negative questions cannot define expected sources.")
 
         if not self.expects_no_answer and not self.expected_sources:
-            raise ValueError(
-                "Positive questions must define expected sources."
-            )
+            raise ValueError("Positive questions must define expected sources.")
 
         return self
 
@@ -147,12 +143,12 @@ class EvalResult(BaseModel):
         default=None,
         ge=0.0,
         le=1.0,
-        )
+    )
     source_page_accuracy: float | None = Field(
         default=None,
         ge=0.0,
         le=1.0,
-        )
+    )
 
     faithfulness: float | None = Field(default=None, ge=0.0, le=1.0)
     answer_relevancy: float | None = Field(default=None, ge=0.0, le=1.0)
@@ -167,43 +163,33 @@ class EvalResult(BaseModel):
 
         if self.error_type is not None:
             if self.generated_answer is not None or self.model is not None:
-                raise ValueError(
-                    "Failed results cannot contain an answer or model."
-                )
+                raise ValueError("Failed results cannot contain an answer or model.")
 
             if any(metric is not None for metric in retrieval_metrics):
-                raise ValueError(
-                    "Failed results cannot contain retrieval metrics."
-                )
+                raise ValueError("Failed results cannot contain retrieval metrics.")
 
             return self
 
         if not self.generated_answer or not self.model:
-            raise ValueError(
-                "Successful results require an answer and model."
-            )
+            raise ValueError("Successful results require an answer and model.")
 
         is_negative = self.ground_truth == NOT_IN_CONTEXT
         if is_negative:
             if any(metric is not None for metric in retrieval_metrics):
-                raise ValueError(
-                    "Negative questions cannot contain retrieval metrics."
-                )
+                raise ValueError("Negative questions cannot contain retrieval metrics.")
         elif any(metric is None for metric in retrieval_metrics):
-            raise ValueError(
-                "Positive questions require all retrieval metrics."
-            )
+            raise ValueError("Positive questions require all retrieval metrics.")
 
         return self
 
-    @computed_field(return_type=bool)
+    @computed_field(return_type=bool)  # type: ignore[prop-decorator]
     @property
     def succeeded(self) -> bool:
         """Return whether evaluation completed successfully."""
 
         return self.error_type is None
 
-    @computed_field(return_type=list[float])
+    @computed_field(return_type=list[float])  # type: ignore[prop-decorator]
     @property
     def retrieval_scores(self) -> list[float]:
         """Return scores without storing duplicate mutable state."""
@@ -248,18 +234,11 @@ class EvalSummary(BaseModel):
         if self.total_questions != len(self.results):
             raise ValueError("total_questions must match results length.")
 
-        if (
-            self.successful_questions + self.failed_questions
-            != self.total_questions
-        ):
-            raise ValueError(
-                "Successful and failed counts must equal total_questions."
-            )
+        if self.successful_questions + self.failed_questions != self.total_questions:
+            raise ValueError("Successful and failed counts must equal total_questions.")
 
         actual_successes = sum(result.succeeded for result in self.results)
         if self.successful_questions != actual_successes:
-            raise ValueError(
-                "successful_questions does not match result statuses."
-            )
+            raise ValueError("successful_questions does not match result statuses.")
 
         return self
