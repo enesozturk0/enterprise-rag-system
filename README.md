@@ -160,14 +160,3 @@ Integration tests require running Ollama and Chroma services:
 .\scripts\dev.ps1 test-all
 ```
 
-## Production Notes
-
-The API and UI bind to `127.0.0.1` by default. For remote access, expose them
-through a TLS-enabled reverse proxy.
-
-In production:
-
-- Never commit the `.env` file.
-- Use a strong and unique API key.
-- Change `BIND_ADDRESS` only when required by the network architecture.
-- Back up the Chroma and Ollama volumes regularly.
