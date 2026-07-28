@@ -38,9 +38,7 @@ class UISettings(BaseSettings):
     @model_validator(mode="after")
     def default_top_k_must_not_exceed_maximum(self) -> Self:
         if self.default_top_k > self.max_top_k:
-            raise ValueError(
-                "RAG_DEFAULT_TOP_K must not exceed RAG_MAX_TOP_K"
-            )
+            raise ValueError("RAG_DEFAULT_TOP_K must not exceed RAG_MAX_TOP_K")
         return self
 
     @property

@@ -27,6 +27,7 @@ class ChatMessage(TypedDict):
     duration_seconds: NotRequired[float]
     is_error: NotRequired[bool]
 
+
 class UploadedPDF(Protocol):
     """Required interface of a Streamlit uploaded PDF."""
 
@@ -37,6 +38,7 @@ class UploadedPDF(Protocol):
         """Return the uploaded file content."""
 
         ...
+
 
 def _initialize_session_state(
     state: MutableMapping[str, object],
@@ -59,6 +61,7 @@ def get_api_client() -> APIClient:
 
     return APIClient(get_ui_settings())
 
+
 def _api_error_message(
     error: APIClientError,
     *,
@@ -67,10 +70,7 @@ def _api_error_message(
     """Return a safe message suitable for display and chat history."""
 
     if isinstance(error, APIAuthenticationError):
-        return (
-            "API kimlik doğrulaması başarısız. "
-            "RAG_API_KEY ayarını kontrol edin."
-        )
+        return "API kimlik doğrulaması başarısız. " "RAG_API_KEY ayarını kontrol edin."
 
     if isinstance(error, APIConnectionError):
         return "Backend servisine ulaşılamıyor."
@@ -98,9 +98,7 @@ def _handle_upload(
     max_size_bytes = settings.max_upload_size_mb * 1024 * 1024
 
     if uploaded_file.size > max_size_bytes:
-        st.warning(
-            f"PDF en fazla {settings.max_upload_size_mb} MB olabilir."
-        )
+        st.warning(f"PDF en fazla {settings.max_upload_size_mb} MB olabilir.")
         return
 
     with st.spinner("Doküman işleniyor ve indeksleniyor..."):
@@ -135,10 +133,7 @@ def _handle_delete(
             return
 
     st.session_state["total_chunks"] = None
-    st.success(
-        f"{result.source} silindi. "
-        f"{result.chunks_deleted} chunk kaldırıldı."
-    )
+    st.success(f"{result.source} silindi. " f"{result.chunks_deleted} chunk kaldırıldı.")
 
 
 def _refresh_stats(client: APIClient) -> None:
@@ -152,6 +147,7 @@ def _refresh_stats(client: APIClient) -> None:
 
     st.session_state["total_chunks"] = stats.total_chunks
 
+
 def _check_backend_health(
     client: APIClient,
     state: MutableMapping[str, object],
@@ -164,13 +160,12 @@ def _check_backend_health(
         # Teknik bağlantı ayrıntısını kullanıcıya sızdırmıyoruz.
         state["backend_healthy"] = False
 
+
 def _render_sidebar(
     settings: UISettings,
     client: APIClient,
 ) -> tuple[int, str | None]:
-
     """Render controlled document-management operations."""
-
 
     with st.sidebar:
         st.header("Sorgu Ayarları")
@@ -213,9 +208,7 @@ def _render_sidebar(
                 "Silinecek dosya adı",
                 placeholder="kullanim-kilavuzu.pdf",
             )
-            confirmed = st.checkbox(
-                "Bu dokümanın tüm chunk'larını silmeyi onaylıyorum."
-            )
+            confirmed = st.checkbox("Bu dokümanın tüm chunk'larını silmeyi onaylıyorum.")
             delete_submitted = st.form_submit_button(
                 "Dokümanı Sil",
                 type="secondary",
@@ -264,6 +257,7 @@ def _render_sidebar(
         source_filter = source_filter_input.strip() or None
         return top_k, source_filter
 
+
 def _get_messages() -> list[ChatMessage]:
     """Return the typed chat history of the current user session."""
 
@@ -307,10 +301,7 @@ def _render_sources(sources: list[SourceDetail]) -> None:
     with st.expander(f"Kaynaklar ({len(sources)})"):
         for index, source in enumerate(sources):
             # st.text kullanmak kaynak adını Markdown olarak yorumlamaz.
-            st.text(
-                f"{source.source} · Sayfa {source.page} "
-                f"· Skor {source.score:.2f}"
-            )
+            st.text(f"{source.source} · Sayfa {source.page} " f"· Skor {source.score:.2f}")
             st.caption(source.content_preview)
 
             if index < len(sources) - 1:
@@ -337,10 +328,7 @@ def _render_message_content(message: ChatMessage) -> None:
     model = message.get("model")
     duration = message.get("duration_seconds")
     if model is not None and duration is not None:
-        st.caption(
-            f"Model: {model} · Süre: {duration:.2f} saniye "
-            f"· Kaynak: {len(sources)}"
-        )
+        st.caption(f"Model: {model} · Süre: {duration:.2f} saniye " f"· Kaynak: {len(sources)}")
 
 
 def _render_chat(
@@ -388,6 +376,7 @@ def _render_chat(
         messages.append(assistant_message)
         _render_message_content(assistant_message)
 
+
 def main() -> None:
     """Configure and render the Streamlit application shell."""
 
@@ -403,9 +392,7 @@ def main() -> None:
     _initialize_session_state(st.session_state)
 
     st.title(settings.page_title)
-    st.caption(
-        "İndekslenen PDF dokümanları hakkında kaynaklı cevaplar alın."
-    )
+    st.caption("İndekslenen PDF dokümanları hakkında kaynaklı cevaplar alın.")
 
     client = get_api_client()
     top_k, source_filter = _render_sidebar(settings, client)

@@ -75,6 +75,7 @@ def test_response_error_can_represent_server_failure() -> None:
     assert error.status_code == 502
     assert error.error_type == "RetrievalError"
 
+
 def _settings() -> UISettings:
     return UISettings(
         _env_file=None,
@@ -131,17 +132,21 @@ def test_connection_failure_is_mapped() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         raise httpx.ConnectError("Connection refused.", request=request)
 
-    with APIClient(
-        _settings(),
-        transport=httpx.MockTransport(handler),
-    ) as client, pytest.raises(APIConnectionError):
+    with (
+        APIClient(
+            _settings(),
+            transport=httpx.MockTransport(handler),
+        ) as client,
+        pytest.raises(APIConnectionError),
+    ):
         client.check_health()
+
 
 def test_document_operations_use_expected_endpoints() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         if request.url.path.endswith("/upload"):
             assert request.method == "POST"
-            assert b'manual.pdf' in request.read()
+            assert b"manual.pdf" in request.read()
             return httpx.Response(
                 201,
                 json={
@@ -181,3 +186,112 @@ def test_document_operations_use_expected_endpoints() -> None:
     assert upload.indexed_chunks == 2
     assert stats.total_chunks == 2
     assert deletion.chunks_deleted == 2
+
+
+def test_health_returns_false_for_non_healthy_status() -> None:
+    transport = httpx.MockTransport(
+        lambda request: httpx.Response(
+            200,
+            json={"status": "degraded"},
+        )
+    )
+
+    with APIClient(_settings(), transport=transport) as client:
+        assert client.check_health() is False
+
+
+def test_invalid_outgoing_payload_is_rejected_before_request() -> None:
+    def unexpected_request(request: httpx.Request) -> httpx.Response:
+        pytest.fail("Invalid payload must not reach the network.")
+
+    with (
+        APIClient(
+            _settings(),
+            transport=httpx.MockTransport(unexpected_request),
+        ) as client,
+        pytest.raises(APIResponseError) as captured,
+    ):
+        client.query("   ")
+
+    assert captured.value.status_code is None
+    assert captured.value.error_type == "ClientValidationError"
+
+
+def test_invalid_success_response_is_mapped() -> None:
+    transport = httpx.MockTransport(
+        lambda request: httpx.Response(
+            200,
+            json={"total_chunks": -1},
+        )
+    )
+
+    with (
+        APIClient(
+            _settings(),
+            transport=transport,
+        ) as client,
+        pytest.raises(APIResponseError) as captured,
+    ):
+        client.get_document_stats()
+
+    assert captured.value.status_code == 200
+    assert captured.value.error_type == "InvalidResponseError"
+
+
+@pytest.mark.parametrize(
+    ("response", "expected_message", "expected_error_type"),
+    [
+        (
+            httpx.Response(503, text="not-json"),
+            "API request failed with status 503.",
+            None,
+        ),
+        (
+            httpx.Response(
+                502,
+                json={
+                    "detail": "Document retrieval service is unavailable.",
+                    "error_type": "RetrievalError",
+                },
+            ),
+            "Document retrieval service is unavailable.",
+            "RetrievalError",
+        ),
+        (
+            httpx.Response(
+                422,
+                json={
+                    "detail": [
+                        {
+                            "type": "missing",
+                            "loc": ["body", "question"],
+                            "msg": "Field required",
+                            "input": {},
+                        }
+                    ]
+                },
+            ),
+            "API request failed with status 422.",
+            None,
+        ),
+    ],
+)
+def test_non_success_responses_are_safely_mapped(
+    response: httpx.Response,
+    expected_message: str,
+    expected_error_type: str | None,
+) -> None:
+    transport = httpx.MockTransport(lambda request: response)
+
+    with (
+        APIClient(
+            _settings(),
+            transport=transport,
+        ) as client,
+        pytest.raises(APIResponseError) as captured,
+    ):
+        client.get_document_stats()
+
+    assert str(captured.value) == expected_message
+    assert captured.value.status_code == response.status_code
+    assert captured.value.error_type == expected_error_type

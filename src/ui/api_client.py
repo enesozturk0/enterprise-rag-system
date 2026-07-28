@@ -22,6 +22,7 @@ from src.ui.config import UISettings
 
 ResponseModelT = TypeVar("ResponseModelT", bound=BaseModel)
 
+
 class APIErrorPayload(BaseModel):
     """Error response returned by FastAPI."""
 
@@ -31,12 +32,14 @@ class APIErrorPayload(BaseModel):
     detail: str | list[dict[str, Any]]
     error_type: str | None = Field(default=None)
 
+
 class HealthResponse(BaseModel):
     """Response returned by the health endpoint."""
 
     model_config = ConfigDict(extra="forbid")
 
     status: str = Field(min_length=1)
+
 
 class APIClientError(Exception):
     """Base error raised by the Streamlit API client."""
@@ -63,6 +66,7 @@ class APIAuthenticationError(APIClientError):
 
 class APIResponseError(APIClientError):
     """Raised for unsuccessful or invalid backend responses."""
+
 
 class APIClient:
     """Synchronous HTTP client for the RAG API."""
@@ -179,9 +183,7 @@ class APIClient:
         """Validate an outgoing request before network communication."""
 
         try:
-            return model_type.model_validate(values).model_dump(
-                exclude_none=True
-            )
+            return model_type.model_validate(values).model_dump(exclude_none=True)
         except ValidationError as exc:
             raise APIResponseError(
                 "Request data is invalid.",
@@ -248,6 +250,7 @@ class APIClient:
             status_code=response.status_code,
             error_type=error_type,
         )
+
 
 __all__ = [
     "APIAuthenticationError",
